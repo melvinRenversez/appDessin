@@ -53,16 +53,18 @@ function drawGrid(){
 function calculateLimits() {
     const canvasWidth = width / scale;
     const canvasHeight = height / scale;
-    const contentWidth = width;
-    const contentHeight = height;
+    const contentWidth = width; // Largeur totale du contenu
+    const contentHeight = height; // Hauteur totale du contenu
 
     // Limites du décalage en fonction du zoom
     const maxOffsetX = Math.min(0, canvasWidth - contentWidth);
     const maxOffsetY = Math.min(0, canvasHeight - contentHeight);
 
+    console.log('limite', maxOffsetX, maxOffsetY);
     return { maxOffsetX, maxOffsetY };
 }
 
+// Appliquer les limites au décalage
 function applyLimits() {
     const { maxOffsetX, maxOffsetY } = calculateLimits();
     offsetX = Math.max(Math.min(offsetX, 0), maxOffsetX);
@@ -129,13 +131,13 @@ canvas.addEventListener('mousemove', (e) => {
         offsetX = e.clientX - startX;
         offsetY = e.clientY - startY;
         console.log("o", offsetX, offsetY)
-        drawGrid(); // Redessiner la grille avec le décalage
-        console.log("drawing grid")
+        applyLimits()
+        drawGrid();
     }
     if (isDrawing) {
         const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
-    const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
+        const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
+        const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
         console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
         fillPixel(x, y)
     }

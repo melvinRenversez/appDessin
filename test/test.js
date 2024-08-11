@@ -12,6 +12,13 @@ const pixelSize = 32
 const zoomSlider = document.getElementById('zoomSlider');
 const colorInput = document.getElementById('color');
 
+let isDragging = false;
+let isDrawing = false;
+let isClearing = false;
+
+let startX, startY;
+let offsetX = 0, offsetY = 0;
+
 var save = []
 
 console.log(width, height)
@@ -31,6 +38,9 @@ setGrid()
 
 function drawGrid(){
     ctx.clearRect(0, 0, width, height)
+
+    ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+
     for(let i = 0; i < save.length; i+=1){
         info = save[i]
         // ctx.strokeRect(info.x, info.y, pixelSize, pixelSize)
@@ -43,8 +53,7 @@ function drawGrid(){
 
 zoomSlider.addEventListener('input' , (e)=>{
     scale = e.target.value
-    ctx.setTransform(scale, 0, 0, scale, 0 * pixelSize, 0 * pixelSize)
-        drawGrid()
+    drawGrid()
 })
 
 function fillPixel(x, y, color){
@@ -63,7 +72,7 @@ canvas.addEventListener('click', (e)=>{
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
     const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
-    console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
+    console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, (e.clientY - rect.top) / pixelSize / scale, offsetX, offsetY, offsetX / pixelSize / scale)
     fillPixel(x, y, color)
 })
 
@@ -80,8 +89,10 @@ canvas.addEventListener('contextmenu', (e) => {
 canvas.addEventListener('mousedown', (e) => {
     if (e.button === 1) {
         isDragging = true;
-        // startX = e.clientX - offsetX;
-        // startY = e.clientY - offsetY;
+        startX = e.clientX - offsetX;
+        startY = e.clientY - offsetY;
+        console.log(startX, startY)
+        canvas.style.cursor = 'move';
     }
     if (e.button === 0) {
         isDrawing = true;
@@ -93,9 +104,10 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
     if (isDragging) {
-        // offsetX = e.clientX - startX;
-        // offsetY = e.clientY - startY;
-        // drawGrid(); // Redessiner la grille avec le décalage
+        offsetX = e.clientX - startX;
+        offsetY = e.clientY - startY;
+        console.log("o", offsetX, offsetY)
+        drawGrid(); // Redessiner la grille avec le décalage
         console.log("drawing grid")
     }
     if (isDrawing) {
@@ -119,6 +131,7 @@ canvas.addEventListener('mouseup', () => {
     isDragging = false;
     isDrawing = false;
     isClearing = false;
+    canvas.style.cursor = 'default';
 });
 
 canvas.addEventListener('mouseout', () => {

@@ -43,16 +43,35 @@ function drawGrid(){
 
     for(let i = 0; i < save.length; i+=1){
         info = save[i]
-        // ctx.strokeRect(info.x, info.y, pixelSize, pixelSize)
+        ctx.strokeRect(info.x, info.y, pixelSize, pixelSize)
         if(info.color.r != '#' && info.color.g != '#' && info.color.b != "#"){
             ctx.fillStyle = `#${info.color.r}${info.color.g}${info.color.b}`
             ctx.fillRect(info.x, info.y, pixelSize, pixelSize)
         }
     }
 }
+function calculateLimits() {
+    const canvasWidth = width / scale;
+    const canvasHeight = height / scale;
+    const contentWidth = width;
+    const contentHeight = height;
+
+    // Limites du décalage en fonction du zoom
+    const maxOffsetX = Math.min(0, canvasWidth - contentWidth);
+    const maxOffsetY = Math.min(0, canvasHeight - contentHeight);
+
+    return { maxOffsetX, maxOffsetY };
+}
+
+function applyLimits() {
+    const { maxOffsetX, maxOffsetY } = calculateLimits();
+    offsetX = Math.max(Math.min(offsetX, 0), maxOffsetX);
+    offsetY = Math.max(Math.min(offsetY, 0), maxOffsetY);
+}
 
 zoomSlider.addEventListener('input' , (e)=>{
     scale = e.target.value
+    applyLimits()
     drawGrid()
 })
 
@@ -67,12 +86,15 @@ function fillPixel(x, y, color){
     }
 }
 
+
 canvas.addEventListener('click', (e)=>{
     color = colorInput.value
     const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
-    const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
-    console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, (e.clientY - rect.top) / pixelSize / scale, offsetX, offsetY, offsetX / pixelSize / scale)
+    const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
+    const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
+
+    console.log(x, y)
+
     fillPixel(x, y, color)
 })
 
@@ -80,8 +102,8 @@ canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     color = "#ffffff"
     const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
-    const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+    const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
+    const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
     console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
     fillPixel(x, y, color)
 })
@@ -112,16 +134,16 @@ canvas.addEventListener('mousemove', (e) => {
     }
     if (isDrawing) {
         const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
-        const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+    const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
+    const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
         console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
         fillPixel(x, y)
     }
     if(isClearing) {
         color = "#ffffff"
         const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
-        const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+        const x = Math.floor((e.clientX - rect.left - offsetX) / scale / pixelSize) * pixelSize
+        const y = Math.floor((e.clientY - rect.top - offsetY) / scale / pixelSize) * pixelSize
         console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
         fillPixel(x, y, color)
     }
@@ -137,3 +159,9 @@ canvas.addEventListener('mouseup', () => {
 canvas.addEventListener('mouseout', () => {
     isDragging = false;
 });
+
+colorInput.addEventListener('input', () => {
+    ctx.fillStyle = colorInput.value;
+})
+
+ctx.fillStyle = "#000000"

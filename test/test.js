@@ -41,8 +41,14 @@ function drawGrid(){
     }
 }
 
-function fillPixel(x, y){
-    ctx.fillStyle = colorInput.value
+zoomSlider.addEventListener('input' , (e)=>{
+    scale = e.target.value
+    ctx.setTransform(scale, 0, 0, scale, 0 * pixelSize, 0 * pixelSize)
+        drawGrid()
+})
+
+function fillPixel(x, y, color){
+    ctx.fillStyle = color
     ctx.fillRect(x, y, pixelSize, pixelSize)
     for(let i = 0; i < save.length; i+=1){
         info = save[i]
@@ -52,18 +58,69 @@ function fillPixel(x, y){
     }
 }
 
-zoomSlider.addEventListener('input' , (e)=>{
-    scale = e.target.value
-    ctx.setTransform(scale, 0, 0, scale, 0, 0)
-    drawGrid()
-})
-
-
 canvas.addEventListener('click', (e)=>{
+    color = colorInput.value
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
     const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
     console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
-    fillPixel(x, y)
+    fillPixel(x, y, color)
 })
 
+canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    color = "#ffffff"
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
+    const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+    console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
+    fillPixel(x, y, color)
+})
+
+canvas.addEventListener('mousedown', (e) => {
+    if (e.button === 1) {
+        isDragging = true;
+        // startX = e.clientX - offsetX;
+        // startY = e.clientY - offsetY;
+    }
+    if (e.button === 0) {
+        isDrawing = true;
+    }
+    if (e.button === 2) {
+        isClearing = true;
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        // offsetX = e.clientX - startX;
+        // offsetY = e.clientY - startY;
+        // drawGrid(); // Redessiner la grille avec le décalage
+        console.log("drawing grid")
+    }
+    if (isDrawing) {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
+        const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+        console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
+        fillPixel(x, y)
+    }
+    if(isClearing) {
+        color = "#ffffff"
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / pixelSize / scale) * pixelSize
+        const y = Math.floor((e.clientY - rect.top) / pixelSize / scale) * pixelSize
+        console.log(x, y, scale, (e.clientX - rect.left) / pixelSize / scale, e.clientY)
+        fillPixel(x, y, color)
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+    isDrawing = false;
+    isClearing = false;
+});
+
+canvas.addEventListener('mouseout', () => {
+    isDragging = false;
+});

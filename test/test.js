@@ -51,31 +51,33 @@ function drawGrid(){
     }
 }
 function calculateLimits() {
-    const canvasWidth = width / scale;
-    const canvasHeight = height / scale;
-    const contentWidth = width; // Largeur totale du contenu
-    const contentHeight = height; // Hauteur totale du contenu
+    const canvasWidth = width * scale;  // Largeur du canevas avec l'échelle appliquée
+    const canvasHeight = height * scale;  // Hauteur du canevas avec l'échelle appliquée
 
-    // Limites du décalage en fonction du zoom
-    const maxOffsetX = Math.min(0, canvasWidth - contentWidth);
-    const maxOffsetY = Math.min(0, canvasHeight - contentHeight);
+    // Limites maximales du décalage (le canevas ne peut pas être déplacé au-delà de son origine)
+    const maxOffsetX = 0;
+    const maxOffsetY = 0;
 
-    console.log('limite', maxOffsetX, maxOffsetY);
-    return { maxOffsetX, maxOffsetY };
+    // Limites minimales du décalage (le canevas ne peut pas être déplacé au-delà du bord visible)
+    const minOffsetX = width - canvasWidth;
+    const minOffsetY = height - canvasHeight;
+
+    console.log('limites', minOffsetX, minOffsetY, maxOffsetX, maxOffsetY);
+    return { minOffsetX, minOffsetY, maxOffsetX, maxOffsetY };
 }
 
-// Appliquer les limites au décalage
 function applyLimits() {
-    const { maxOffsetX, maxOffsetY } = calculateLimits();
-    offsetX = Math.max(Math.min(offsetX, 0), maxOffsetX);
-    offsetY = Math.max(Math.min(offsetY, 0), maxOffsetY);
+    const { minOffsetX, minOffsetY, maxOffsetX, maxOffsetY } = calculateLimits();
+    offsetX = Math.max(Math.min(offsetX, maxOffsetX), minOffsetX);
+    offsetY = Math.max(Math.min(offsetY, maxOffsetY), minOffsetY);
 }
 
+// Mettre à jour l'écouteur d'événements pour le zoom
 zoomSlider.addEventListener('input' , (e)=>{
-    scale = e.target.value
-    applyLimits()
-    drawGrid()
-})
+    scale = e.target.value;
+    applyLimits();
+    drawGrid();
+});
 
 function fillPixel(x, y, color){
     ctx.fillStyle = color

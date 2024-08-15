@@ -1,16 +1,38 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 body {
     display: flex;
+    height: 100vh;
+}
+.buttons{
+    width: 25%;
+    height: 100%;
+    background: red;
+    display: flex;
     flex-direction: column;
+    align-items: baseline;
+    padding: 20px;
+}
+.buttons *{
+    margin: 10px;
+    font-size: 20px;
+}
+.buttons input[type="color"]{
+    width: 100px;
+    height: 30px;
+}
+.buttons input[type="range"]{
+    width: 140px;
+}
+.draw{
+    width: 75%;
+    height: 100%;
+    background: orange;
+    display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
-}
-#pixelCanvas {
-    border: 1px solid #000;
-    background-color: #fff;
-}
-#zoomSlider {
-    margin-bottom: 20px;
+    padding: 10px;
 }

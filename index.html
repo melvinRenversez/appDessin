@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Art</title>
+    <link rel="stylesheet" href="style.css">
+    <title>PhoMEL</title>
     <style>
         #canvas {
             border: 1px solid black;
@@ -11,9 +12,22 @@
     </style>
 </head>
 <body>
-    <input type="color" id="color" value="#000000">
-    <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1">
-    <canvas id="canvas" width="512" height="512"></canvas>
-    <script src="test.js"></script>
+    <div class="buttons">
+
+        <input type="color" id="color" value="#000000">
+        <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1">
+        <button onclick="exportSave()">Export</button>
+        <input type="file" name="" id="inputSave">
+        <button onclick="importSave()">Import</button>
+
+    </div>
+
+    <div class="draw" id="draw">
+        
+        <canvas id="canvas" width="800" height="800"></canvas>
+
+    </div>
+    
+    <script src="script.js"></script>
 </body>
 </html>

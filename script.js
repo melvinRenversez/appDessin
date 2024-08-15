@@ -1,13 +1,15 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+const inputSave = document.getElementById('inputSave');
+
 // const basePixelSize = 16;
 let scale = 1;
 
 const width = canvas.width
 const height = canvas.height
 
-const pixelSize = 16
+const pixelSize = 8
 
 const zoomSlider = document.getElementById('zoomSlider');
 const colorInput = document.getElementById('color');
@@ -22,6 +24,8 @@ let offsetX = 0, offsetY = 0;
 var save = []
 
 console.log(width, height)
+
+ctx.fillStyle = "#000000"
 
 function setGrid(){
     for(let x = 0; x < width; x += pixelSize){
@@ -164,8 +168,70 @@ canvas.addEventListener('mouseout', () => {
     isDragging = false;
 });
 
+document.getElementById('draw').addEventListener('scroll', (e) => {
+    console.log('Défilement détecté', e);
+    console.log('Scroll position:', canvasContainer.scrollTop, canvasContainer.scrollLeft);
+})
+
 colorInput.addEventListener('input', () => {
     ctx.fillStyle = colorInput.value;
 })
 
-ctx.fillStyle = "#000000"
+function exportSave(){
+    console.log('export');
+    
+    const saveData = JSON.stringify(save);
+    
+    const filename = 'PhoMEl.$MEL';
+    
+    // Créer un élément <a>
+    const element = document.createElement('a');
+    
+    // Créer un objet Blob avec le contenu du fichier (le texte de l'utilisateur)
+    const file = new Blob([saveData], {type: 'text/plain'});
+    
+    // Créer une URL pour le Blob
+    element.href = URL.createObjectURL(file);
+    
+    // Spécifier le nom du fichier à télécharger
+    element.download = filename;
+    
+    // Ajouter l'élément <a> au DOM
+    document.body.appendChild(element);
+    
+    // Déclencher un clic sur l'élément <a>
+    element.click();
+    
+}
+function importSave() {
+    if (inputSave.files.length === 0) {
+        console.error('Aucun fichier sélectionné.');
+        return;
+    }
+
+    const file = inputSave.files[0];
+
+    if (!file.name.endsWith('.$MEL')) {
+        console.error('Le fichier sélectionné n\'a pas l\'extension .MEL.');
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const fileContent = e.target.result;
+
+        try {
+            // Parser le contenu comme JSON
+            save = JSON.parse(fileContent);
+            console.log('Données JSON:', save);
+            console.log(JSON.stringify(save));
+            drawGrid(); // Redessiner la grille avec les nouvelles données
+        } catch (err) {
+            console.error('Le contenu du fichier n\'est pas du JSON valide.');
+        }
+    };
+
+    // Lire le fichier comme texte
+    reader.readAsText(file);
+}

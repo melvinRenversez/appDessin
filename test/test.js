@@ -1,13 +1,13 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-const basePixelSize = 32;
+// const basePixelSize = 16;
 let scale = 1;
 
 const width = canvas.width
 const height = canvas.height
 
-const pixelSize = 32
+const pixelSize = 16
 
 const zoomSlider = document.getElementById('zoomSlider');
 const colorInput = document.getElementById('color');
